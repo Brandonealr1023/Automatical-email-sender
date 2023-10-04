@@ -1,0 +1,55 @@
+Sub EnviarEmails()
+    Dim App As Object
+    Dim Mail As Object
+    Dim Correo As Workbook
+    Dim Base As Worksheet
+    Dim Ruta As String
+    Dim File As String
+    Dim Extension As String
+    Dim Adjunto As Variant
+    Dim i As Long
+
+    ' Definir la aplicación de Outlook
+    Set App = CreateObject("Outlook.Application")
+
+    ' Abrir el libro de Excel
+    Set Correo = Workbooks.Open("File_name") ' Cambia la ruta a tu archivo Excel
+
+    ' Definir la hoja de Excel
+    Set Base = Correo.Sheets("Ardest") ' Cambia "Hoja7" al nombre de tu hoja
+
+    ' Recorrer filas desde la 2 hasta la última con datos en la columna A
+    For i = 2 To Base.Cells(Rows.Count, "A").End(xlUp).Row
+        ' Crear un nuevo correo electrónico
+        Set Mail = App.CreateItem(0)
+        
+        ' Configurar los campos del correo electrónico
+        With Mail
+            .Display
+            .To = Base.Range("B" & i).Value
+            .CC = Base.Range("C" & i).Value
+            .BCC = Base.Range("D" & i).Value
+            .Subject = Base.Range("E" & i).Value
+            .Body = Base.Range("F" & i).Value
+            
+            ' Adjuntar archivos si se proporciona una ruta en la columna G
+            If Base.Range("G" & i).Value <> "" Then
+                .Attachments.Add Base.Range("G" & i).Value
+                .Attachments.Add Base.Range("H" & i).Value
+                .Attachments.Add Base.Range("I" & i).Value
+            End If
+        End With
+        
+        ' Liberar el objeto Mail
+        Set Mail = Nothing
+    Next i
+
+    ' Cerrar el libro de Excel
+    Correo.Close SaveChanges:=False
+
+    ' Liberar la memoria
+    Set Base = Nothing
+    Set Correo = Nothing
+    Set App = Nothing
+End Sub
+    
